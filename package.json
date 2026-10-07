@@ -1,41 +1,46 @@
 {
-  "name": "@saibotsivad/hato",
-  "version": "0.0.0",
-  "private": true,
-  "type": "module",
-  "description": "Courier pigeon that receives GitHub webhooks on a Cloudflare Worker and streams them to an on-prem machine over a WebSocket, with buffering while you're offline.",
-  "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit",
-    "start": "node ./example-server-listener.js"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261007.1",
-    "typescript": "^7.0.2",
-    "wrangler": "^4.148.0",
-    "ws": "^8.22.0",
-    "@eslint/compat": "^1.4.0",
-		"@eslint/js": "^9.39.1",
-		"@types/node": "^24",
-		"@types/ws": "^8.18.1",
-		"eslint": "^9.39.1",
+	"name": "@saibotsivad/hato",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"description": "Courier pigeon that receives GitHub webhooks on a Cloudflare Worker and streams them to an on-prem machine over a WebSocket, with buffering while you're offline.",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"typecheck": "tsc --noEmit",
+		"start": "node ./example-server-listener.js",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write ."
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^5.20261007.1",
+		"@eslint/compat": "^2.1.1",
+		"@eslint/js": "^10.0.1",
+		"@types/node": "^24.19.1",
+		"@types/ws": "^8.18.2",
+		"eslint": "^10.12.0",
 		"eslint-config-prettier": "^10.1.8",
-		"globals": "^16.5.0",
-		"prettier": "^3.7.4",
-		"typescript-eslint": "^8.48.1"
-  },
-  "cloudflare": {
-    "bindings": {
-      "WEBHOOK_SECRET": {
-        "description": "The secret GitHub uses to sign webhook deliveries. Generate one with `openssl rand -hex 32`, then paste the **same value** into the *Secret* field when you create the webhook in GitHub."
-      },
-      "CLIENT_TOKEN": {
-        "description": "The token your local client uses to connect. Generate one with `openssl rand -hex 32` and put it in `client/.env` as `CLIENT_TOKEN`."
-      },
-      "RETENTION_DAYS": {
-        "description": "How many days to keep events your client hasn't acknowledged before deleting them."
-      }
-    }
-  }
+		"globals": "^17.13.0",
+		"prettier": "^3.9.9",
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.71.1",
+		"wrangler": "^4.148.0",
+		"ws": "^8.22.0"
+	},
+	"cloudflare": {
+		"bindings": {
+			"WEBHOOK_SECRET": {
+				"description": "The secret GitHub uses to sign webhook deliveries. Generate one with `openssl rand -hex 32`, then paste the **same value** into the *Secret* field when you create the webhook in GitHub."
+			},
+			"CLIENT_TOKEN": {
+				"description": "The token your local client uses to connect. Generate one with `openssl rand -hex 32` and put it in `client/.env` as `CLIENT_TOKEN`."
+			},
+			"RETENTION_DAYS": {
+				"description": "How many days to keep events your client hasn't acknowledged before deleting them."
+			}
+		}
+	},
+	"overrides": {
+		"sharp": "^0.35.5"
+	}
 }
