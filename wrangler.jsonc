@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "github-webhook-relay",
+  "name": "hato",
   "main": "src/index.ts",
   "compatibility_date": "2026-09-01",
   "workers_dev": true,
