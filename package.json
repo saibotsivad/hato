@@ -8,7 +8,9 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "start": "node ./example-server-listener.js"
+    "start": "node ./example-server-listener.js",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write ."
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261007.1",
