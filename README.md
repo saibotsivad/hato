@@ -51,18 +51,19 @@ npx wrangler secret put WEBHOOK_SECRET
 npx wrangler secret put CLIENT_TOKEN
 npm run deploy
 ```
+
 </details>
 
 ### 2. Add the webhook in GitHub
 
 In your repo (or org, or GitHub App) go to **Settings → Webhooks → Add webhook**:
 
-| Field | Value |
-| --- | --- |
-| Payload URL | `https://hato.<you>.workers.dev/webhook` |
-| Content type | `application/json` |
-| Secret | your `WEBHOOK_SECRET` |
-| Events | "Let me select individual events": **Issue comments**, **Pull request review comments**, **Pull request reviews** (add whatever else you need) |
+| Field        | Value                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Payload URL  | `https://hato.<you>.workers.dev/webhook`                                                                                                       |
+| Content type | `application/json`                                                                                                                             |
+| Secret       | your `WEBHOOK_SECRET`                                                                                                                          |
+| Events       | "Let me select individual events": **Issue comments**, **Pull request review comments**, **Pull request reviews** (add whatever else you need) |
 
 GitHub sends a `ping` event immediately; it'll be waiting for your client.
 
@@ -92,11 +93,11 @@ Put your bot's logic in `handleEvent()` in `client/index.js`.
 
 ## Endpoints
 
-| Path | Auth | Purpose |
-| --- | --- | --- |
-| `POST /webhook` | GitHub signature | Receives deliveries |
-| `GET /connect` | `Authorization: Bearer <CLIENT_TOKEN>` | WebSocket for the client |
-| `GET /status` | `Authorization: Bearer <CLIENT_TOKEN>` | Pending event count and connected clients |
+| Path            | Auth                                   | Purpose                                   |
+| --------------- | -------------------------------------- | ----------------------------------------- |
+| `POST /webhook` | GitHub signature                       | Receives deliveries                       |
+| `GET /connect`  | `Authorization: Bearer <CLIENT_TOKEN>` | WebSocket for the client                  |
+| `GET /status`   | `Authorization: Bearer <CLIENT_TOKEN>` | Pending event count and connected clients |
 
 ```bash
 curl -H "Authorization: Bearer $CLIENT_TOKEN" https://hato.<you>.workers.dev/status
