@@ -1,11 +1,13 @@
-# github-webhook-relay
+# Hato
 
-Receive GitHub webhooks on a Cloudflare Worker and stream them to a program on your own computer over a WebSocket. Your machine never needs a public address or open ports, and events that arrive while it's offline are buffered and replayed when it reconnects.
+![](./hato-pigeon-courier.png)
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/YOUR-USERNAME/github-webhook-relay)
+Hato (鳩 in [Japanese](https://www.nihongomaster.com/japanese/dictionary/word/45981/hato-hato-%E9%B3%A9-%E9%B4%BF-%E3%81%AF%E3%81%A8-%E3%83%8F%E3%83%88)) is a Courier pigeon that receives GitHub webhooks to a Cloudflare Worker and streams them to an on-premises application of your choosing over a WebSocket. Your machine never needs a public address or open ports, and events that arrive while it's offline are buffered and replayed when it reconnects.
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/saibotsivad/hato)
 
 ```
-GitHub ──POST /webhook──▶ Worker ──▶ Durable Object (SQLite buffer) ◀──WebSocket── your computer
+GitHub(POST /webhook) ──▶ Worker ──▶ Durable Object (SQLite buffer) ◀── Computer(WebSocket)
 ```
 
 ## How it works
@@ -20,6 +22,11 @@ GitHub ──POST /webhook──▶ Worker ──▶ Durable Object (SQLite buff
 
 Delivery is **at-least-once**: if your handler crashes mid-event, that event is replayed. Design your bot logic so handling the same event twice is safe.
 
+## Non Goals
+
+- Multiple organizations: this is not a packaged SaaS, it's meant to help you manage your handful of repositories
+- Very large teams: it uses a single Durable Object instance and SQLite database, that will be a big bottleneck
+
 ## Setup
 
 ### 1. Deploy the Worker
@@ -33,7 +40,7 @@ openssl rand -hex 32
 - `WEBHOOK_SECRET`: shared with GitHub to sign deliveries.
 - `CLIENT_TOKEN`: used by your local client to connect.
 
-Keep both handy. When it finishes you'll have a URL like `https://github-webhook-relay.<you>.workers.dev`.
+Keep both handy. When it finishes you'll have a URL like `https://hato.<you>.workers.dev`.
 
 <details>
 <summary>Deploying manually with Wrangler instead</summary>
@@ -52,7 +59,7 @@ In your repo (or org, or GitHub App) go to **Settings → Webhooks → Add webho
 
 | Field | Value |
 | --- | --- |
-| Payload URL | `https://github-webhook-relay.<you>.workers.dev/webhook` |
+| Payload URL | `https://hato.<you>.workers.dev/webhook` |
 | Content type | `application/json` |
 | Secret | your `WEBHOOK_SECRET` |
 | Events | "Let me select individual events": **Issue comments**, **Pull request review comments**, **Pull request reviews** (add whatever else you need) |
@@ -73,7 +80,7 @@ npm start
 You should see the ping, then live events:
 
 ```
-Connected to github-webhook-relay.you.workers.dev, resuming after #0
+Connected to hato.<you>.workers.dev, resuming after #0
 • #1 ping me/repo
    GitHub says: "Keep it logically awesome."
 Caught up on 1 missed event(s)
@@ -92,7 +99,7 @@ Put your bot's logic in `handleEvent()` in `client/index.js`.
 | `GET /status` | `Authorization: Bearer <CLIENT_TOKEN>` | Pending event count and connected clients |
 
 ```bash
-curl -H "Authorization: Bearer $CLIENT_TOKEN" https://github-webhook-relay.<you>.workers.dev/status
+curl -H "Authorization: Bearer $CLIENT_TOKEN" https://hato.<you>.workers.dev/status
 ```
 
 ## Notes
