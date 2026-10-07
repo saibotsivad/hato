@@ -1,0 +1,14 @@
+node_modules/
+
+# Wrangler
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+
+# Local env / client state
+.env
+.env.*
+!.env.example
+.relay-state.json
+
+.DS_Store
