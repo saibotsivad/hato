@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
-	"description": "Courier pigeon that receives GitHub webhooks on a Cloudflare Worker and streams them to an on-prem machine over a WebSocket, with buffering while you're offline.",
+	"description": "Courier pigeon that receives GitHub or Forgejo webhooks on a Cloudflare Worker and streams them to an on-prem machine over a WebSocket, with buffering while you're offline.",
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy",
@@ -30,7 +30,7 @@
 	"cloudflare": {
 		"bindings": {
 			"WEBHOOK_SECRET": {
-				"description": "The secret GitHub uses to sign webhook deliveries. Generate one with `openssl rand -hex 32`, then paste the **same value** into the *Secret* field when you create the webhook in GitHub."
+				"description": "The secret GitHub or Forgejo uses to sign webhook deliveries. Generate one with `openssl rand -hex 32`, then paste the **same value** into the *Secret* field when you create the webhook."
 			},
 			"CLIENT_TOKEN": {
 				"description": "The token your local client uses to connect. Generate one with `openssl rand -hex 32` and put it in `client/.env` as `CLIENT_TOKEN`."
