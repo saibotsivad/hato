@@ -1,0 +1,21 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = tab
+indent_size = 4
+
+# YAML forbids tabs for indentation outright, so the settings above cannot apply
+# here. Prettier reads this file, and with nothing to say about YAML it took
+# `indent_size = 4` and indented with four spaces; two is what everything else
+# writing YAML uses.
+[*.{yaml,yml}]
+indent_style = space
+indent_size = 2
+
+[*.{js,ts}]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = true
