@@ -183,7 +183,10 @@ export class EventHub extends DurableObject<Env> {
 
 			let replayed = 0
 			for (const row of backlog) {
-				trySend(ws, formatEvent(row.seq, row.delivery_id, row.event, row.payload, row.received_at))
+				trySend(
+					ws,
+					formatEvent(row.seq, row.delivery_id, row.event, row.payload, row.received_at),
+				)
 				replayed++
 			}
 			ws.serializeAttachment({ ready: true } satisfies SocketState)
@@ -218,7 +221,9 @@ export class EventHub extends DurableObject<Env> {
 		const cutoff = Date.now() - days * 24 * 60 * 60 * 1000
 		this.ctx.storage.sql.exec('DELETE FROM events WHERE received_at < ?', cutoff)
 
-		const { n } = this.ctx.storage.sql.exec<{ n: number }>('SELECT COUNT(*) AS n FROM events').one()
+		const { n } = this.ctx.storage.sql
+			.exec<{ n: number }>('SELECT COUNT(*) AS n FROM events')
+			.one()
 		if (n > 0) await this.scheduleCleanup()
 	}
 

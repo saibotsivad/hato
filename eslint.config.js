@@ -22,7 +22,10 @@ export default defineConfig(
 			'no-undef': 'off',
 
 			// We ignore unused caught errors if prefixed explicitly
-			'@typescript-eslint/no-unused-vars': ['error', { caughtErrorsIgnorePattern: '^_ignore' }],
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ caughtErrorsIgnorePattern: '^_ignore' },
+			],
 		},
 	},
 )
