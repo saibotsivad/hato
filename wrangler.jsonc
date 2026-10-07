@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "github-webhook-relay",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+
+  "vars": {
+    "RETENTION_DAYS": "7"
+  },
+
+  "durable_objects": {
+    "bindings": [{ "name": "HUB", "class_name": "EventHub" }]
+  },
+
+  // SQLite-backed Durable Object: events are buffered in its built-in database.
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["EventHub"] }]
+}

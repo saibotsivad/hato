@@ -1,0 +1,29 @@
+{
+  "name": "github-webhook-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Receive GitHub webhooks on a Cloudflare Worker and stream them to your local machine over a WebSocket, with buffering while you're offline.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.148.0"
+  },
+  "cloudflare": {
+    "bindings": {
+      "WEBHOOK_SECRET": {
+        "description": "The secret GitHub uses to sign webhook deliveries. Generate one with `openssl rand -hex 32`, then paste the **same value** into the *Secret* field when you create the webhook in GitHub."
+      },
+      "CLIENT_TOKEN": {
+        "description": "The token your local client uses to connect. Generate one with `openssl rand -hex 32` and put it in `client/.env` as `CLIENT_TOKEN`."
+      },
+      "RETENTION_DAYS": {
+        "description": "How many days to keep events your client hasn't acknowledged before deleting them."
+      }
+    }
+  }
+}
