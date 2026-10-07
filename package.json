@@ -1,8 +1,8 @@
 {
-  "name": "github-webhook-relay",
-  "version": "1.0.0",
+  "name": "@saibotsivad/hato",
+  "version": "0.0.0",
   "private": true,
-  "description": "Receive GitHub webhooks on a Cloudflare Worker and stream them to your local machine over a WebSocket, with buffering while you're offline.",
+  "description": "Courier pigeon that receives GitHub webhooks on a Cloudflare Worker and streams them to an on-prem machine over a WebSocket, with buffering while you're offline.",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
