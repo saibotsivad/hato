@@ -16,20 +16,15 @@ export default {
 		const url = new URL(request.url)
 		const hub = env.HUB.get(env.HUB.idFromName('main'))
 
-		// GitHub -> relay
+		// GitHub or Forgejo -> relay
 		if (url.pathname === '/webhook' && request.method === 'POST') {
 			const body = await request.text()
-			const valid = await verifyGitHubSignature(
-				env.WEBHOOK_SECRET,
-				body,
-				request.headers.get('X-Hub-Signature-256'),
-			)
+			const { signature, deliveryId, event } = readWebhookHeaders(request.headers)
+			const valid = await verifySignature(env.WEBHOOK_SECRET, body, signature)
 			if (!valid) return new Response('invalid signature', { status: 401 })
 
-			const deliveryId = request.headers.get('X-GitHub-Delivery')
-			const event = request.headers.get('X-GitHub-Event')
 			if (!deliveryId || !event) {
-				return new Response('missing GitHub headers', { status: 400 })
+				return new Response('missing webhook headers', { status: 400 })
 			}
 
 			const result = await hub.ingest(deliveryId, event, body)
@@ -57,8 +52,8 @@ export default {
 
 		if (url.pathname === '/') {
 			return new Response(
-				'github-webhook-relay is running.\n' +
-					'Point your GitHub webhook at /webhook and your client at /connect.\n',
+				'hato is running.\n' +
+					'Point your GitHub or Forgejo webhook at /webhook and your client at /connect.\n',
 			)
 		}
 
@@ -111,7 +106,7 @@ export class EventHub extends DurableObject<Env> {
 			)
 			.toArray()
 
-		// GitHub retried or someone clicked "Redeliver": already stored.
+		// The forge retried or someone clicked "Redeliver": already stored.
 		if (rows.length === 0) return { stored: false, duplicate: true }
 
 		const seq = rows[0].seq
@@ -262,15 +257,28 @@ function trySend(ws: WebSocket, message: string) {
 
 const encoder = new TextEncoder()
 
-/** Verify GitHub's X-Hub-Signature-256 header (HMAC-SHA256, constant time). */
-async function verifyGitHubSignature(
-	secret: string,
-	body: string,
-	header: string | null,
-): Promise<boolean> {
-	if (!secret || !header?.startsWith('sha256=')) return false
-	const hex = header.slice('sha256='.length)
-	if (!/^[0-9a-f]{64}$/i.test(hex)) return false
+/**
+ * Pull the signature, delivery ID and event name out of a webhook request.
+ *
+ * GitHub sends X-Hub-Signature-256 ("sha256=<hex>"), X-GitHub-Delivery and
+ * X-GitHub-Event. Forgejo sends X-Forgejo-Signature (bare hex),
+ * X-Forgejo-Delivery and X-Forgejo-Event, and usually the GitHub-style headers
+ * too for compatibility. Forgejo's own headers win when present.
+ */
+function readWebhookHeaders(headers: Headers) {
+	const hubSignature = headers.get('X-Hub-Signature-256')
+	return {
+		signature:
+			headers.get('X-Forgejo-Signature') ??
+			(hubSignature?.startsWith('sha256=') ? hubSignature.slice('sha256='.length) : null),
+		deliveryId: headers.get('X-Forgejo-Delivery') ?? headers.get('X-GitHub-Delivery'),
+		event: headers.get('X-Forgejo-Event') ?? headers.get('X-GitHub-Event'),
+	}
+}
+
+/** Verify a hex HMAC-SHA256 signature of the body (constant time). */
+async function verifySignature(secret: string, body: string, hex: string | null): Promise<boolean> {
+	if (!secret || !hex || !/^[0-9a-f]{64}$/i.test(hex)) return false
 
 	const signature = new Uint8Array(32)
 	for (let i = 0; i < 32; i++) signature[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16)
